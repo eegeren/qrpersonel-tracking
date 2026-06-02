@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AuthForm } from "@/components/AuthForm";
 import { getSession } from "@/lib/auth";
@@ -16,9 +15,6 @@ export default async function LoginPage() {
         <div className="mt-6">
           <AuthForm mode="login" />
         </div>
-        <p className="mt-5 text-center text-sm text-ink/60">
-          İlk kurulum mu? <Link href="/register" className="font-semibold text-mint">Sorumlu hesabı oluşturun</Link>
-        </p>
       </div>
     </main>
   );

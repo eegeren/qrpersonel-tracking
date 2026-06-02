@@ -45,6 +45,12 @@ export function AuthForm({ mode }: AuthFormProps) {
         <span className="text-sm font-medium text-ink/70">Şifre</span>
         <input name="password" type="password" minLength={6} required autoComplete={mode === "login" ? "current-password" : "new-password"} className="mt-1 h-11 w-full rounded-lg border border-ink/15 px-3 outline-none focus:border-mint" />
       </label>
+      {mode === "register" && (
+        <label className="block">
+          <span className="text-sm font-medium text-ink/70">Kurulum kodu</span>
+          <input name="setupCode" required autoComplete="off" className="mt-1 h-11 w-full rounded-lg border border-ink/15 px-3 outline-none focus:border-mint" />
+        </label>
+      )}
       {error && <p className="rounded-lg bg-coral/10 px-3 py-2 text-sm text-coral">{error}</p>}
       <button disabled={loading} className="h-11 w-full rounded-lg bg-ink font-semibold text-white hover:bg-ink/90 disabled:opacity-60">
         {loading ? "Bekleyin..." : mode === "login" ? "Giriş yap" : "Hesap oluştur"}

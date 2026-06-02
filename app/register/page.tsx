@@ -11,8 +11,8 @@ export default async function RegisterPage() {
   return (
     <main className="grid min-h-screen place-items-center bg-cloud px-4 py-10">
       <div className="w-full max-w-md rounded-lg border border-ink/10 bg-white p-6 shadow-soft">
-        <h1 className="text-2xl font-semibold text-ink">İlk kurulum</h1>
-        <p className="mt-2 text-sm text-ink/60">Sorumlu hesabını bir kez oluşturun. Bu cihazda panel açık kalır.</p>
+        <h1 className="text-2xl font-semibold text-ink">Yetkili kurulum</h1>
+        <p className="mt-2 text-sm text-ink/60">Bu ekran sadece kurulum kodu olan yetkili kişiler içindir.</p>
         <div className="mt-6">
           <AuthForm mode="register" />
         </div>

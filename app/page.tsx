@@ -13,7 +13,7 @@ export default function LandingPage() {
         </Link>
         <div className="flex items-center gap-2">
           <Link href="/login" className="rounded-lg px-4 py-2 text-sm font-semibold hover:bg-white">Giriş</Link>
-          <Link href="/register" className="rounded-lg bg-ink px-4 py-2 text-sm font-semibold text-white">Başla</Link>
+          <Link href="/login" className="rounded-lg bg-ink px-4 py-2 text-sm font-semibold text-white">Sorumlu girişi</Link>
         </div>
       </header>
       <section className="mx-auto grid max-w-7xl gap-8 px-4 pb-16 pt-8 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:pt-16">

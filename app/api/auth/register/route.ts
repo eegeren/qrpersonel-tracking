@@ -6,7 +6,8 @@ import { createSession } from "@/lib/auth";
 
 const schema = z.object({
   username: z.string().min(3).max(32).regex(/^[a-zA-Z0-9_.-]+$/),
-  password: z.string().min(6)
+  password: z.string().min(6),
+  setupCode: z.string().min(1)
 });
 
 export async function POST(request: Request) {
@@ -14,9 +15,15 @@ export async function POST(request: Request) {
     if (!process.env.DATABASE_URL) {
       return NextResponse.json({ error: "Veritabanı ayarı eksik. DATABASE_URL tanımlanmalı." }, { status: 500 });
     }
+    if (!process.env.OWNER_SETUP_CODE) {
+      return NextResponse.json({ error: "Sorumlu kayıt kodu ayarlanmamış." }, { status: 500 });
+    }
 
     const parsed = schema.safeParse(await request.json());
-    if (!parsed.success) return NextResponse.json({ error: "Kullanıcı adı veya şifreyi kontrol edin." }, { status: 400 });
+    if (!parsed.success) return NextResponse.json({ error: "Kullanıcı adı, şifre veya kurulum kodunu kontrol edin." }, { status: 400 });
+    if (parsed.data.setupCode !== process.env.OWNER_SETUP_CODE) {
+      return NextResponse.json({ error: "Kurulum kodu hatalı." }, { status: 403 });
+    }
 
     const username = parsed.data.username.toLowerCase();
     const exists = await prisma.user.findUnique({ where: { username } });
