@@ -32,7 +32,7 @@ export async function POST(request: Request) {
       })
     : null;
   if (!store || !employee || employee.storeId !== store.id || !employee.active) {
-    return NextResponse.json({ error: "Personel bu mağaza için yetkili değil." }, { status: 403 });
+    return NextResponse.json({ error: "Bu T.C. kimlik bu mağaza için kayıtlı değil." }, { status: 403 });
   }
 
   if (store.latitude && store.longitude && parsed.data.latitude && parsed.data.longitude) {

@@ -25,18 +25,15 @@ export default async function DashboardPage() {
   const lateCount = todayRecords.filter((record) => record.status === "LATE").length;
   const missingCheckout = todayRecords.filter((record) => record.checkInTime && !record.checkOutTime).length;
   const checkedOutCount = todayRecords.filter((record) => record.checkOutTime).length;
-  const recordByEmployee = new Map(todayRecords.map((record) => [record.employeeId, record]));
-  const rows = activeEmployees.map((employee) => {
-    const record = recordByEmployee.get(employee.id);
-    const status = !record
-      ? "Henüz gelmedi"
-      : record.status === "LATE"
+  const rows = todayRecords.map((record) => {
+    const status =
+      record.status === "LATE"
         ? "Geç geldi"
         : record.checkOutTime
           ? "Çıkış yaptı"
           : "İş başında";
 
-    return { employee, record, status };
+    return { record, status };
   });
 
   return (
@@ -44,7 +41,7 @@ export default async function DashboardPage() {
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-3xl font-semibold">Mağaza sorumlusu paneli</h1>
-          <p className="mt-1 text-ink/60">Bugün kim işe kaçta geldi, kaçta çıktı ve kim henüz gelmedi buradan görünür.</p>
+          <p className="mt-1 text-ink/60">Bugün QR okutan personelin adını, maskeli T.C. bilgisini, giriş ve çıkış saatini görün.</p>
         </div>
       </div>
       <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -55,7 +52,7 @@ export default async function DashboardPage() {
       </div>
       <section className="mt-6 overflow-hidden rounded-lg border border-ink/10 bg-white shadow-soft">
         <div className="border-b border-ink/10 px-5 py-4">
-          <h2 className="text-lg font-semibold">Bugünkü personel giriş çıkışları</h2>
+          <h2 className="text-lg font-semibold">Bugün QR okutanlar</h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[760px] text-left text-sm">
@@ -71,12 +68,12 @@ export default async function DashboardPage() {
             </thead>
             <tbody>
               {rows.map((row) => (
-                <tr key={row.employee.id} className="border-t border-ink/10">
-                  <td className="px-4 py-3 font-semibold">{row.employee.fullName}</td>
-                  <td className="px-4 py-3">{row.employee.nationalIdMasked}</td>
-                  <td className="px-4 py-3">{row.employee.store.name}</td>
-                  <td className="px-4 py-3">{formatDateTime(row.record?.checkInTime)}</td>
-                  <td className="px-4 py-3">{formatDateTime(row.record?.checkOutTime)}</td>
+                <tr key={row.record.id} className="border-t border-ink/10">
+                  <td className="px-4 py-3 font-semibold">{row.record.employee.fullName}</td>
+                  <td className="px-4 py-3">{row.record.employee.nationalIdMasked}</td>
+                  <td className="px-4 py-3">{row.record.store.name}</td>
+                  <td className="px-4 py-3">{formatDateTime(row.record.checkInTime)}</td>
+                  <td className="px-4 py-3">{formatDateTime(row.record.checkOutTime)}</td>
                   <td className="px-4 py-3">
                     <span className="rounded-lg bg-cloud px-2 py-1 text-xs font-semibold text-ink/70">{row.status}</span>
                   </td>
@@ -85,7 +82,7 @@ export default async function DashboardPage() {
             </tbody>
           </table>
         </div>
-        {rows.length === 0 && <p className="p-6 text-center text-ink/60">Aktif personel bulunamadı.</p>}
+        {rows.length === 0 && <p className="p-6 text-center text-ink/60">Bugün henüz QR okutan personel yok.</p>}
       </section>
     </AppShell>
   );
