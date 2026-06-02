@@ -2,24 +2,13 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireOwner } from "@/lib/auth";
+import { hashNationalId, isValidNationalId, maskNationalId, nationalIdLast4, normalizeNationalId } from "@/lib/nationalId";
 
 const schema = z.object({
   fullName: z.string().min(2),
-  email: z.string().email(),
-  phone: z.string().optional(),
-  position: z.string().optional(),
+  nationalId: z.string().min(1),
   storeId: z.string().min(1)
 });
-
-async function createUniqueEmployeeCode() {
-  for (let index = 0; index < 8; index += 1) {
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-    const existing = await prisma.employee.findUnique({ where: { checkCode: code } });
-    if (!existing) return code;
-  }
-
-  return crypto.randomUUID().slice(0, 8).toUpperCase();
-}
 
 export async function GET() {
   const owner = await requireOwner();
@@ -39,14 +28,17 @@ export async function POST(request: Request) {
   const store = await prisma.store.findFirst({ where: { id: parsed.data.storeId, ownerId: owner.id } });
   if (!store) return NextResponse.json({ error: "Mağaza bulunamadı." }, { status: 404 });
 
-  const email = parsed.data.email.toLowerCase();
+  const nationalId = normalizeNationalId(parsed.data.nationalId);
+  if (!isValidNationalId(nationalId)) {
+    return NextResponse.json({ error: "T.C. kimlik numarası 11 haneli olmalı." }, { status: 400 });
+  }
+
   const employee = await prisma.employee.create({
     data: {
       fullName: parsed.data.fullName,
-      email,
-      checkCode: await createUniqueEmployeeCode(),
-      phone: parsed.data.phone,
-      position: parsed.data.position,
+      nationalIdHash: hashNationalId(nationalId),
+      nationalIdLast4: nationalIdLast4(nationalId),
+      nationalIdMasked: maskNationalId(nationalId),
       storeId: parsed.data.storeId
     }
   });

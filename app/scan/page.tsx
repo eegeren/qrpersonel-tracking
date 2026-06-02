@@ -3,8 +3,6 @@ import { QrCode } from "lucide-react";
 import { QRScanner } from "@/components/QRScanner";
 
 export default async function ScanPage({ searchParams }: { searchParams?: { store?: string; action?: string } }) {
-  const action = searchParams?.action === "checkout" ? "checkout" : "checkin";
-
   return (
     <main className="min-h-screen bg-cloud px-4 py-5 text-ink">
       <div className="mx-auto flex max-w-md items-center justify-between">
@@ -19,10 +17,10 @@ export default async function ScanPage({ searchParams }: { searchParams?: { stor
       <div className="mx-auto mt-6 max-w-2xl text-center">
         <p className="mx-auto mb-3 w-fit rounded-lg bg-mint/10 px-3 py-1 text-sm font-semibold text-mint">Personel ekranı</p>
         <h1 className="text-3xl font-semibold">QR ile giriş çıkış</h1>
-        <p className="mt-2 text-ink/60">Tek ekran kullanılır. Okutulan QR giriş veya çıkış bilgisini kendi içinde taşır.</p>
+        <p className="mt-2 text-ink/60">Önce 11 haneli T.C. kimlik numaranızı girin, ardından mağaza QR kodunu okutun.</p>
       </div>
       <div className="mt-6">
-        <QRScanner initialQrSecret={searchParams?.store ?? ""} initialAction={action} />
+        <QRScanner initialQrSecret={searchParams?.store ?? ""} />
       </div>
     </main>
   );

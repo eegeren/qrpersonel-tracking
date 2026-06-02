@@ -30,7 +30,6 @@ model User {
   updatedAt    DateTime @updatedAt
 
   stores    Store[]
-  employee  Employee?
 }
 
 model Store {
@@ -53,19 +52,18 @@ model Store {
 model Employee {
   id           String   @id @default(cuid())
   fullName     String
-  email        String   @unique
-  checkCode    String   @unique @default(cuid())
-  phone        String?
-  position     String?
+  nationalIdHash String @default(cuid())
+  nationalIdLast4 String @default("0000")
+  nationalIdMasked String @default("***MASKED***")
   active       Boolean  @default(true)
   storeId      String
-  userId       String?  @unique
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
   store       Store              @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  user        User?              @relation(fields: [userId], references: [id], onDelete: SetNull)
   attendances AttendanceRecord[]
+
+  @@unique([storeId, nationalIdHash])
 }
 
 model AttendanceRecord {

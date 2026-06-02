@@ -62,6 +62,7 @@ export default async function DashboardPage() {
             <thead className="bg-cloud text-ink/60">
               <tr>
                 <th className="px-4 py-3 font-semibold">Personel</th>
+                <th className="px-4 py-3 font-semibold">T.C. kimlik</th>
                 <th className="px-4 py-3 font-semibold">Mağaza</th>
                 <th className="px-4 py-3 font-semibold">Giriş</th>
                 <th className="px-4 py-3 font-semibold">Çıkış</th>
@@ -72,6 +73,7 @@ export default async function DashboardPage() {
               {rows.map((row) => (
                 <tr key={row.employee.id} className="border-t border-ink/10">
                   <td className="px-4 py-3 font-semibold">{row.employee.fullName}</td>
+                  <td className="px-4 py-3">{row.employee.nationalIdMasked}</td>
                   <td className="px-4 py-3">{row.employee.store.name}</td>
                   <td className="px-4 py-3">{formatDateTime(row.record?.checkInTime)}</td>
                   <td className="px-4 py-3">{formatDateTime(row.record?.checkOutTime)}</td>

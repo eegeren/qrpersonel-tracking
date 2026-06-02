@@ -7,10 +7,7 @@ type StoreOption = { id: string; name: string };
 type EmployeeItem = {
   id: string;
   fullName: string;
-  email: string;
-  checkCode: string;
-  phone: string | null;
-  position: string | null;
+  nationalIdMasked: string;
   active: boolean;
   store: StoreOption;
 };
@@ -42,9 +39,7 @@ export function EmployeeManager({ employees, stores }: { employees: EmployeeItem
         <h2 className="text-lg font-semibold">Personel ekle</h2>
         <div className="mt-4 space-y-3">
           <input name="fullName" required placeholder="Ad soyad" className="h-11 w-full rounded-lg border border-ink/15 px-3" />
-          <input name="email" type="email" required placeholder="E-posta" className="h-11 w-full rounded-lg border border-ink/15 px-3" />
-          <input name="phone" placeholder="Telefon" className="h-11 w-full rounded-lg border border-ink/15 px-3" />
-          <input name="position" placeholder="Pozisyon" className="h-11 w-full rounded-lg border border-ink/15 px-3" />
+          <input name="nationalId" required inputMode="numeric" maxLength={11} pattern="\d{11}" placeholder="T.C. kimlik numarası" className="h-11 w-full rounded-lg border border-ink/15 px-3" />
           <select name="storeId" required className="h-11 w-full rounded-lg border border-ink/15 px-3">
             <option value="">Mağaza seçin</option>
             {stores.map((store) => (
@@ -64,8 +59,7 @@ export function EmployeeManager({ employees, stores }: { employees: EmployeeItem
               <tr>
                 <th className="px-4 py-3 font-semibold">Personel</th>
                 <th className="px-4 py-3 font-semibold">Mağaza</th>
-                <th className="px-4 py-3 font-semibold">Personel kodu</th>
-                <th className="px-4 py-3 font-semibold">Pozisyon</th>
+                <th className="px-4 py-3 font-semibold">T.C. kimlik</th>
                 <th className="px-4 py-3 font-semibold">Durum</th>
                 <th className="px-4 py-3 font-semibold"></th>
               </tr>
@@ -75,13 +69,11 @@ export function EmployeeManager({ employees, stores }: { employees: EmployeeItem
                 <tr key={employee.id} className="border-t border-ink/10">
                   <td className="px-4 py-3">
                     <p className="font-semibold">{employee.fullName}</p>
-                    <p className="text-ink/55">{employee.email}</p>
                   </td>
                   <td className="px-4 py-3">{employee.store.name}</td>
                   <td className="px-4 py-3">
-                    <span className="rounded-lg bg-cloud px-2 py-1 font-semibold tracking-normal">{employee.checkCode}</span>
+                    <span className="rounded-lg bg-cloud px-2 py-1 font-semibold tracking-normal">{employee.nationalIdMasked}</span>
                   </td>
-                  <td className="px-4 py-3">{employee.position || "-"}</td>
                   <td className="px-4 py-3">
                     <span className="rounded-lg bg-mint/10 px-2 py-1 text-xs font-semibold text-mint">{employee.active ? "Aktif" : "Pasif"}</span>
                   </td>
