@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  OWNER
+  EMPLOYEE
+}
+
+enum AttendanceStatus {
+  CHECKED_IN
+  CHECKED_OUT
+  LATE
+  MISSING_CHECKOUT
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  username     String   @unique @default(cuid())
+  email        String?  @unique
+  passwordHash String
+  role         UserRole @default(OWNER)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  stores    Store[]
+  employee  Employee?
+}
+
+model Store {
+  id             String   @id @default(cuid())
+  name           String
+  address        String?
+  qrSecret       String   @unique @default(cuid())
+  latitude       Float?
+  longitude      Float?
+  locationRadius Int      @default(150)
+  ownerId        String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  owner       User               @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  employees   Employee[]
+  attendances AttendanceRecord[]
+}
+
+model Employee {
+  id           String   @id @default(cuid())
+  fullName     String
+  email        String   @unique
+  checkCode    String   @unique @default(cuid())
+  phone        String?
+  position     String?
+  active       Boolean  @default(true)
+  storeId      String
+  userId       String?  @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  store       Store              @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  user        User?              @relation(fields: [userId], references: [id], onDelete: SetNull)
+  attendances AttendanceRecord[]
+}
+
+model AttendanceRecord {
+  id           String           @id @default(cuid())
+  employeeId   String
+  storeId      String
+  date         DateTime
+  checkInTime  DateTime?
+  checkOutTime DateTime?
+  status       AttendanceStatus @default(CHECKED_IN)
+  latitude     Float?
+  longitude    Float?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  store    Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@unique([employeeId, storeId, date])
+  @@index([storeId, date])
+}
