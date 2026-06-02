@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import QRCode from "qrcode";
 import { Download, ExternalLink } from "lucide-react";
 
-export function StoreQr({ value, fileName = "magaza-qr" }: { value: string; fileName?: string }) {
+export function StoreQr({ value, fileName = "magaza-qr", title }: { value: string; fileName?: string; title?: string }) {
   const [src, setSrc] = useState("");
 
   useEffect(() => {
@@ -22,6 +22,7 @@ export function StoreQr({ value, fileName = "magaza-qr" }: { value: string; file
 
   return (
     <div className="flex w-full flex-col items-center gap-3">
+      {title && <p className="text-sm font-semibold text-ink">{title}</p>}
       <img src={src} alt="Mağaza QR kodu" className="h-[220px] w-[220px] rounded-lg border border-ink/10 bg-white p-3" />
       <div className="grid w-full grid-cols-2 gap-2">
         <button onClick={downloadQr} type="button" className="flex h-10 items-center justify-center gap-2 rounded-lg bg-ink text-sm font-semibold text-white">

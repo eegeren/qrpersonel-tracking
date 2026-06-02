@@ -8,6 +8,7 @@ const schema = z.object({
   employeeId: z.string().optional(),
   employeeCode: z.string().optional(),
   qrSecret: z.string().min(1),
+  action: z.enum(["checkin", "checkout"]).default("checkin"),
   latitude: z.number().optional(),
   longitude: z.number().optional()
 });
@@ -43,14 +44,25 @@ export async function POST(request: Request) {
     where: { employeeId_storeId_date: { employeeId: employee.id, storeId: store.id, date: today } }
   });
 
-  if (!existing) {
+  if (parsed.data.action === "checkin") {
+    if (existing?.checkInTime) {
+      return NextResponse.json({ error: "Bugün için giriş zaten kaydedildi." }, { status: 409 });
+    }
+
     const now = new Date();
     const status = getLateStatus(now);
-    await prisma.attendanceRecord.create({
-      data: {
+    await prisma.attendanceRecord.upsert({
+      where: { employeeId_storeId_date: { employeeId: employee.id, storeId: store.id, date: today } },
+      create: {
         employeeId: employee.id,
         storeId: store.id,
         date: today,
+        checkInTime: now,
+        status,
+        latitude: parsed.data.latitude,
+        longitude: parsed.data.longitude
+      },
+      update: {
         checkInTime: now,
         status,
         latitude: parsed.data.latitude,
@@ -60,7 +72,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: status === "LATE" ? "Geç giriş kaydedildi." : "Giriş kaydedildi." });
   }
 
-  if (existing.checkInTime && !existing.checkOutTime) {
+  if (!existing?.checkInTime) {
+    return NextResponse.json({ error: "Çıkış için önce giriş kaydı olmalı." }, { status: 409 });
+  }
+
+  if (!existing.checkOutTime) {
     await prisma.attendanceRecord.update({
       where: { id: existing.id },
       data: { checkOutTime: new Date(), status: "CHECKED_OUT" }
@@ -68,5 +84,5 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "Çıkış kaydedildi." });
   }
 
-  return NextResponse.json({ error: "Bugün için giriş ve çıkış zaten tamamlandı." }, { status: 409 });
+  return NextResponse.json({ error: "Bugün için çıkış zaten kaydedildi." }, { status: 409 });
 }

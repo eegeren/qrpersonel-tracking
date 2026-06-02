@@ -2,7 +2,9 @@ import Link from "next/link";
 import { QrCode } from "lucide-react";
 import { QRScanner } from "@/components/QRScanner";
 
-export default async function ScanPage({ searchParams }: { searchParams?: { store?: string } }) {
+export default async function ScanPage({ searchParams }: { searchParams?: { store?: string; action?: string } }) {
+  const action = searchParams?.action === "checkout" ? "checkout" : "checkin";
+
   return (
     <main className="min-h-screen bg-cloud px-4 py-5 text-ink">
       <div className="mx-auto flex max-w-md items-center justify-between">
@@ -20,7 +22,7 @@ export default async function ScanPage({ searchParams }: { searchParams?: { stor
         <p className="mt-2 text-ink/60">Personel kodu cihazda kalır. QR okunduktan sonra kayıt butonu aktif olur.</p>
       </div>
       <div className="mt-6">
-        <QRScanner initialQrSecret={searchParams?.store ?? ""} />
+        <QRScanner initialQrSecret={searchParams?.store ?? ""} initialAction={action} />
       </div>
     </main>
   );

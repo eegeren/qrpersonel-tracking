@@ -51,7 +51,7 @@ export function StoreManager({ stores, appUrl }: { stores: StoreItem[]; appUrl: 
       </form>
       <div className="grid gap-4">
         {stores.map((store) => (
-          <article key={store.id} className="grid gap-5 rounded-lg border border-ink/10 bg-white p-5 shadow-soft md:grid-cols-[1fr_240px]">
+          <article key={store.id} className="grid gap-5 rounded-lg border border-ink/10 bg-white p-5 shadow-soft xl:grid-cols-[1fr_520px]">
             <div>
               <div className="flex items-start justify-between gap-3">
                 <div>
@@ -77,9 +77,23 @@ export function StoreManager({ stores, appUrl }: { stores: StoreItem[]; appUrl: 
                 </div>
               </dl>
             </div>
-            <div className="flex flex-col items-center gap-2">
-              <StoreQr value={`${appUrl}/scan?store=${store.qrSecret}`} fileName={`${store.name.toLowerCase().replaceAll(" ", "-")}-qr`} />
-              <p className="text-center text-xs text-ink/55">Personel bu QR kodu tarayarak giriş veya çıkış yapar.</p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="rounded-lg border border-mint/20 bg-mint/5 p-3">
+                <StoreQr
+                  value={`${appUrl}/scan?store=${store.qrSecret}&action=checkin`}
+                  fileName={`${store.name.toLowerCase().replaceAll(" ", "-")}-giris-qr`}
+                  title="Giriş QR"
+                />
+                <p className="mt-2 text-center text-xs text-ink/55">Sabah işe giriş için okutulur.</p>
+              </div>
+              <div className="rounded-lg border border-coral/20 bg-coral/5 p-3">
+                <StoreQr
+                  value={`${appUrl}/scan?store=${store.qrSecret}&action=checkout`}
+                  fileName={`${store.name.toLowerCase().replaceAll(" ", "-")}-cikis-qr`}
+                  title="Çıkış QR"
+                />
+                <p className="mt-2 text-center text-xs text-ink/55">Mesai çıkışında okutulur.</p>
+              </div>
             </div>
           </article>
         ))}

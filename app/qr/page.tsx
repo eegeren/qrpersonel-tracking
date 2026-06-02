@@ -14,7 +14,7 @@ export default async function QrPage() {
   return (
     <AppShell>
       <h1 className="text-3xl font-semibold">Mağaza QR oluştur</h1>
-      <p className="mt-1 text-ink/60">Her mağaza için tek QR yeterlidir. Personel sabah ve çıkışta aynı QR kodu okutur.</p>
+      <p className="mt-1 text-ink/60">Her mağaza için iki QR oluşur: biri giriş, biri çıkış için okutulur.</p>
       <div className="mt-6">
         <StoreManager stores={stores} appUrl={process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"} />
       </div>
