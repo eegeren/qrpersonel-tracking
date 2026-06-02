@@ -19,7 +19,7 @@ export default async function ScanPage({ searchParams }: { searchParams?: { stor
       <div className="mx-auto mt-6 max-w-2xl text-center">
         <p className="mx-auto mb-3 w-fit rounded-lg bg-mint/10 px-3 py-1 text-sm font-semibold text-mint">Personel ekranı</p>
         <h1 className="text-3xl font-semibold">QR ile giriş çıkış</h1>
-        <p className="mt-2 text-ink/60">Personel kodu cihazda kalır. QR okunduktan sonra kayıt butonu aktif olur.</p>
+        <p className="mt-2 text-ink/60">Tek ekran kullanılır. Okutulan QR giriş veya çıkış bilgisini kendi içinde taşır.</p>
       </div>
       <div className="mt-6">
         <QRScanner initialQrSecret={searchParams?.store ?? ""} initialAction={action} />

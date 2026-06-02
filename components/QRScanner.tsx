@@ -8,6 +8,14 @@ const DEVICE_EMPLOYEE_CODE_KEY = "qr-personel-code";
 
 type AttendanceAction = "checkin" | "checkout";
 
+function parseQrValue(value: string): { secret: string; action: AttendanceAction } {
+  const url = new URL(value, window.location.origin);
+  const secret = url.searchParams.get("store") ?? value.split("store=").at(-1)?.split("&").at(0) ?? value;
+  const action = url.searchParams.get("action") === "checkout" ? "checkout" : "checkin";
+
+  return { secret, action };
+}
+
 export function QRScanner({ initialQrSecret = "", initialAction = "checkin" }: { initialQrSecret?: string; initialAction?: AttendanceAction }) {
   const ref = useRef<Html5Qrcode | null>(null);
   const lastScanRef = useRef("");
@@ -33,9 +41,7 @@ export function QRScanner({ initialQrSecret = "", initialAction = "checkin" }: {
         { facingMode: "environment" },
         { fps: 10, qrbox: { width: 260, height: 260 } },
         (decoded) => {
-          const url = new URL(decoded, window.location.origin);
-          const secret = url.searchParams.get("store") ?? decoded.split("store=").at(-1)?.split("&").at(0) ?? decoded;
-          const nextAction = url.searchParams.get("action") === "checkout" ? "checkout" : "checkin";
+          const { secret, action: nextAction } = parseQrValue(decoded);
           const scanKey = `${secret}:${nextAction}`;
           if (lastScanRef.current === scanKey) return;
           lastScanRef.current = scanKey;
@@ -100,6 +106,12 @@ export function QRScanner({ initialQrSecret = "", initialAction = "checkin" }: {
     setMessage("Personel kodu bu cihazdan kaldırıldı.");
   }
 
+  function updateManualQr(value: string) {
+    const { secret, action: nextAction } = parseQrValue(value.trim());
+    setQrSecret(secret);
+    setAction(nextAction);
+  }
+
   const buttonText = loading
     ? "Kaydediliyor..."
     : !employeeCode
@@ -151,20 +163,14 @@ export function QRScanner({ initialQrSecret = "", initialAction = "checkin" }: {
           />
         </label>
         {showManualQr && (
-          <div className="space-y-3">
-            <label className="block">
-              <span className="text-sm font-medium text-ink/65">QR anahtarı</span>
-              <input value={qrSecret} onChange={(event) => setQrSecret(event.target.value.trim())} className="mt-1 h-11 w-full rounded-lg border border-ink/15 px-3" />
-            </label>
-            <div className="grid grid-cols-2 gap-2">
-              <button onClick={() => setAction("checkin")} type="button" className={`h-10 rounded-lg text-sm font-semibold ${action === "checkin" ? "bg-mint text-white" : "bg-cloud text-ink/65"}`}>
-                Giriş
-              </button>
-              <button onClick={() => setAction("checkout")} type="button" className={`h-10 rounded-lg text-sm font-semibold ${action === "checkout" ? "bg-coral text-white" : "bg-cloud text-ink/65"}`}>
-                Çıkış
-              </button>
-            </div>
-          </div>
+          <label className="block">
+            <span className="text-sm font-medium text-ink/65">QR bağlantısı veya anahtarı</span>
+            <input
+              value={qrSecret}
+              onChange={(event) => updateManualQr(event.target.value)}
+              className="mt-1 h-11 w-full rounded-lg border border-ink/15 px-3"
+            />
+          </label>
         )}
         <button onClick={submit} disabled={loading || !employeeCode || !qrSecret} className="flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-mint font-semibold text-white disabled:opacity-60">
           {loading ? <Camera size={18} aria-hidden /> : <CheckCircle2 size={18} aria-hidden />}
