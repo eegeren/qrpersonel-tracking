@@ -1,3 +1,5 @@
+const APP_TIME_ZONE = "Europe/Istanbul";
+
 export function startOfToday() {
   const date = new Date();
   date.setHours(0, 0, 0, 0);
@@ -14,6 +16,7 @@ export function startOfMonth() {
 export function formatDateTime(date?: Date | null) {
   if (!date) return "-";
   return new Intl.DateTimeFormat("tr-TR", {
+    timeZone: APP_TIME_ZONE,
     hour: "2-digit",
     minute: "2-digit",
     day: "2-digit",
@@ -29,9 +32,18 @@ export function formatHours(hours: number) {
 export function getLateStatus(now = new Date()) {
   const lateAfter = process.env.LATE_AFTER ?? "09:15";
   const [hour, minute] = lateAfter.split(":").map(Number);
-  const threshold = new Date(now);
-  threshold.setHours(hour, minute, 0, 0);
-  return now > threshold ? "LATE" : "CHECKED_IN";
+  const parts = new Intl.DateTimeFormat("tr-TR", {
+    timeZone: APP_TIME_ZONE,
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false
+  }).formatToParts(now);
+  const currentHour = Number(parts.find((part) => part.type === "hour")?.value ?? 0);
+  const currentMinute = Number(parts.find((part) => part.type === "minute")?.value ?? 0);
+  const currentTotalMinutes = currentHour * 60 + currentMinute;
+  const lateTotalMinutes = hour * 60 + minute;
+
+  return currentTotalMinutes > lateTotalMinutes ? "LATE" : "CHECKED_IN";
 }
 
 export function hoursBetween(start?: Date | null, end?: Date | null) {
