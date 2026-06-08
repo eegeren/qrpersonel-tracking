@@ -3,11 +3,12 @@ import { AppShell } from "@/components/AppShell";
 import { StatCard } from "@/components/StatCard";
 import { requireOwner } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { formatDateTime, startOfToday } from "@/lib/dates";
+import { formatDateTime, getWorkSchedule, startOfToday } from "@/lib/dates";
 
 export default async function DashboardPage() {
   const owner = await requireOwner();
   const today = startOfToday();
+  const workSchedule = getWorkSchedule();
 
   const [todayRecords, activeEmployees] = await Promise.all([
     prisma.attendanceRecord.findMany({
@@ -47,8 +48,8 @@ export default async function DashboardPage() {
       <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard title="Bugünkü girişler" value={`${todayRecords.length}`} note="QR ile kaydedilen personel" icon={UserCheck} />
         <StatCard title="Aktif personel" value={`${activeEmployees.length}`} note="Sorumlu olduğunuz mağazalar" icon={Clock} />
-        <StatCard title="Geç gelenler" value={`${lateCount}`} note="Tanımlı geç kalma saatinden sonra" icon={AlertTriangle} />
-        <StatCard title="Çıkış yapanlar" value={`${checkedOutCount}`} note={`${missingCheckout} personel şu an iş başında`} icon={LogOut} />
+        <StatCard title="Geç gelenler" value={`${lateCount}`} note={`${workSchedule.start} başlangıcından sonra`} icon={AlertTriangle} />
+        <StatCard title="Çıkış yapanlar" value={`${checkedOutCount}`} note={`${workSchedule.end} çıkış hedefi, ${missingCheckout} kişi iş başında`} icon={LogOut} />
       </div>
       <section className="mt-6 overflow-hidden rounded-lg border border-ink/10 bg-white shadow-soft">
         <div className="border-b border-ink/10 px-5 py-4">

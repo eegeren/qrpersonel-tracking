@@ -1,4 +1,18 @@
 const APP_TIME_ZONE = "Europe/Istanbul";
+const DEFAULT_WORK_START = "09:00";
+const DEFAULT_WORK_END = "10:00";
+
+function parseTime(value: string) {
+  const [hour = 0, minute = 0] = value.split(":").map(Number);
+  return { hour, minute, totalMinutes: hour * 60 + minute };
+}
+
+export function getWorkSchedule() {
+  return {
+    start: process.env.WORK_START ?? process.env.LATE_AFTER ?? DEFAULT_WORK_START,
+    end: process.env.WORK_END ?? DEFAULT_WORK_END
+  };
+}
 
 export function startOfToday() {
   const date = new Date();
@@ -30,8 +44,8 @@ export function formatHours(hours: number) {
 }
 
 export function getLateStatus(now = new Date()) {
-  const lateAfter = process.env.LATE_AFTER ?? "09:15";
-  const [hour, minute] = lateAfter.split(":").map(Number);
+  const { start } = getWorkSchedule();
+  const workStart = parseTime(start);
   const parts = new Intl.DateTimeFormat("tr-TR", {
     timeZone: APP_TIME_ZONE,
     hour: "2-digit",
@@ -41,9 +55,8 @@ export function getLateStatus(now = new Date()) {
   const currentHour = Number(parts.find((part) => part.type === "hour")?.value ?? 0);
   const currentMinute = Number(parts.find((part) => part.type === "minute")?.value ?? 0);
   const currentTotalMinutes = currentHour * 60 + currentMinute;
-  const lateTotalMinutes = hour * 60 + minute;
 
-  return currentTotalMinutes > lateTotalMinutes ? "LATE" : "CHECKED_IN";
+  return currentTotalMinutes > workStart.totalMinutes ? "LATE" : "CHECKED_IN";
 }
 
 export function hoursBetween(start?: Date | null, end?: Date | null) {
