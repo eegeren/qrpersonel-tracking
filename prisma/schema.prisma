@@ -40,6 +40,9 @@ model Store {
   latitude       Float?
   longitude      Float?
   locationRadius Int      @default(150)
+  workStartTime  String   @default("09:00")
+  workEndTime    String   @default("10:00")
+  lateToleranceMinutes Int @default(0)
   ownerId        String
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
@@ -56,6 +59,8 @@ model Employee {
   nationalIdLast4 String @default("0000")
   nationalIdMasked String @default("***MASKED***")
   active       Boolean  @default(true)
+  workStartTime String?
+  workEndTime   String?
   storeId      String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt

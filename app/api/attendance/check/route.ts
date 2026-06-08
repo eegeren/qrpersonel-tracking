@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { startOfToday, getLateStatus } from "@/lib/dates";
+import { getAttendanceSchedule, startOfToday, getLateStatus } from "@/lib/dates";
 import { distanceMeters } from "@/lib/geo";
 import { hashNationalId, isValidNationalId, normalizeNationalId } from "@/lib/nationalId";
 
@@ -28,7 +28,8 @@ export async function POST(request: Request) {
           storeId: store.id,
           nationalIdHash: hashNationalId(nationalId),
           active: true
-        }
+        },
+        include: { store: true }
       })
     : null;
   if (!store || !employee || employee.storeId !== store.id || !employee.active) {
@@ -52,7 +53,13 @@ export async function POST(request: Request) {
 
   if (!existing) {
     const now = new Date();
-    const status = getLateStatus(now);
+    const schedule = getAttendanceSchedule({
+      employeeStart: employee.workStartTime,
+      employeeEnd: employee.workEndTime,
+      storeStart: employee.store.workStartTime,
+      storeEnd: employee.store.workEndTime
+    });
+    const status = getLateStatus(now, schedule.start, employee.store.lateToleranceMinutes);
     await prisma.attendanceRecord.create({
       data: {
         employeeId: employee.id,

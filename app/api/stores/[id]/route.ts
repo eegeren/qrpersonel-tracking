@@ -8,7 +8,10 @@ const schema = z.object({
   address: z.string().optional(),
   latitude: z.preprocess((value) => (value === "" ? undefined : value), z.coerce.number().optional()),
   longitude: z.preprocess((value) => (value === "" ? undefined : value), z.coerce.number().optional()),
-  locationRadius: z.coerce.number().int().min(25).max(1000).default(150)
+  locationRadius: z.coerce.number().int().min(25).max(1000).default(150),
+  workStartTime: z.string().regex(/^\d{2}:\d{2}$/).default("09:00"),
+  workEndTime: z.string().regex(/^\d{2}:\d{2}$/).default("10:00"),
+  lateToleranceMinutes: z.coerce.number().int().min(0).max(120).default(0)
 });
 
 export async function PUT(request: Request, { params }: { params: { id: string } }) {

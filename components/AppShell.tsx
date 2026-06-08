@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { QrCode, LayoutDashboard, Users } from "lucide-react";
+import { QrCode, LayoutDashboard, Store, Users } from "lucide-react";
 
 const nav = [
   { href: "/dashboard", label: "Sorumlu paneli", icon: LayoutDashboard },
   { href: "/employees", label: "Personel kayıt", icon: Users },
-  { href: "/qr", label: "QR oluştur", icon: QrCode },
+  { href: "/qr", label: "Mağaza ayarı", icon: Store },
   { href: "/scan", label: "Personel QR", icon: QrCode }
 ];
 

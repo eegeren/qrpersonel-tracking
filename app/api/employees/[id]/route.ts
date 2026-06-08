@@ -8,7 +8,9 @@ const schema = z.object({
   fullName: z.string().min(2),
   nationalId: z.string().optional(),
   storeId: z.string().min(1),
-  active: z.boolean().default(true)
+  active: z.boolean().default(true),
+  workStartTime: z.preprocess((value) => (value === "" ? null : value), z.string().regex(/^\d{2}:\d{2}$/).nullable().optional()),
+  workEndTime: z.preprocess((value) => (value === "" ? null : value), z.string().regex(/^\d{2}:\d{2}$/).nullable().optional())
 });
 
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
@@ -31,6 +33,8 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       fullName: parsed.data.fullName,
       storeId: parsed.data.storeId,
       active: parsed.data.active,
+      workStartTime: parsed.data.workStartTime,
+      workEndTime: parsed.data.workEndTime,
       ...(nationalId
         ? {
             nationalIdHash: hashNationalId(nationalId),

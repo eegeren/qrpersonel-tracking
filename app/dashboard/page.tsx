@@ -3,7 +3,7 @@ import { AppShell } from "@/components/AppShell";
 import { StatCard } from "@/components/StatCard";
 import { requireOwner } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { formatDateTime, getWorkSchedule, startOfToday } from "@/lib/dates";
+import { formatDateTime, getAttendanceSchedule, getWorkSchedule, startOfToday } from "@/lib/dates";
 
 export default async function DashboardPage() {
   const owner = await requireOwner();
@@ -27,6 +27,12 @@ export default async function DashboardPage() {
   const missingCheckout = todayRecords.filter((record) => record.checkInTime && !record.checkOutTime).length;
   const checkedOutCount = todayRecords.filter((record) => record.checkOutTime).length;
   const rows = todayRecords.map((record) => {
+    const schedule = getAttendanceSchedule({
+      employeeStart: record.employee.workStartTime,
+      employeeEnd: record.employee.workEndTime,
+      storeStart: record.store.workStartTime,
+      storeEnd: record.store.workEndTime
+    });
     const status =
       record.status === "LATE"
         ? "Geç geldi"
@@ -34,7 +40,7 @@ export default async function DashboardPage() {
           ? "Çıkış yaptı"
           : "İş başında";
 
-    return { record, status };
+    return { record, schedule, status };
   });
 
   return (
@@ -56,12 +62,13 @@ export default async function DashboardPage() {
           <h2 className="text-lg font-semibold">Bugün QR okutanlar</h2>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[760px] text-left text-sm">
+          <table className="w-full min-w-[940px] text-left text-sm">
             <thead className="bg-cloud text-ink/60">
               <tr>
                 <th className="px-4 py-3 font-semibold">Personel</th>
                 <th className="px-4 py-3 font-semibold">T.C. kimlik</th>
                 <th className="px-4 py-3 font-semibold">Mağaza</th>
+                <th className="px-4 py-3 font-semibold">Beklenen</th>
                 <th className="px-4 py-3 font-semibold">Giriş</th>
                 <th className="px-4 py-3 font-semibold">Çıkış</th>
                 <th className="px-4 py-3 font-semibold">Durum</th>
@@ -73,6 +80,7 @@ export default async function DashboardPage() {
                   <td className="px-4 py-3 font-semibold">{row.record.employee.fullName}</td>
                   <td className="px-4 py-3">{row.record.employee.nationalIdMasked}</td>
                   <td className="px-4 py-3">{row.record.store.name}</td>
+                  <td className="px-4 py-3">{row.schedule.start} / {row.schedule.end}</td>
                   <td className="px-4 py-3">{formatDateTime(row.record.checkInTime)}</td>
                   <td className="px-4 py-3">{formatDateTime(row.record.checkOutTime)}</td>
                   <td className="px-4 py-3">

@@ -7,7 +7,9 @@ import { hashNationalId, isValidNationalId, maskNationalId, nationalIdLast4, nor
 const schema = z.object({
   fullName: z.string().min(2),
   nationalId: z.string().min(1),
-  storeId: z.string().min(1)
+  storeId: z.string().min(1),
+  workStartTime: z.preprocess((value) => (value === "" ? null : value), z.string().regex(/^\d{2}:\d{2}$/).nullable().optional()),
+  workEndTime: z.preprocess((value) => (value === "" ? null : value), z.string().regex(/^\d{2}:\d{2}$/).nullable().optional())
 });
 
 export async function GET() {
@@ -39,6 +41,8 @@ export async function POST(request: Request) {
       nationalIdHash: hashNationalId(nationalId),
       nationalIdLast4: nationalIdLast4(nationalId),
       nationalIdMasked: maskNationalId(nationalId),
+      workStartTime: parsed.data.workStartTime,
+      workEndTime: parsed.data.workEndTime,
       storeId: parsed.data.storeId
     }
   });
